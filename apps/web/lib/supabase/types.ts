@@ -1,1 +1,1 @@
-export type { Database } from "@fashion-marketplace/shared-types";
+export type { Database } from "./database.types";
