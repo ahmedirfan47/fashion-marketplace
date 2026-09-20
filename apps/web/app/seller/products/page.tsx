@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentSellerBrand } from "@/lib/sellers/queries";
 import { formatPrice } from "@/lib/utils";
+import { LinkButton } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export default async function SellerProductsPage() {
   const brand = await getCurrentSellerBrand();
@@ -16,33 +18,41 @@ export default async function SellerProductsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl">Products</h1>
-        <Link
-          href="/seller/products/new"
-          className="bg-accent text-accent-ink px-4 py-2 text-sm font-medium hover:opacity-90"
-        >
-          Add product
-        </Link>
+        <div>
+          <h1 className="font-display text-2xl text-ink">Products</h1>
+          <p className="mt-1 text-sm text-muted">Manage what customers see in your shop.</p>
+        </div>
+        <LinkButton href="/seller/products/new">Add product</LinkButton>
       </div>
 
       {products && products.length > 0 ? (
-        <div className="divide-y divide-border border-y border-border">
-          {products.map((product) => (
-            <Link
-              key={product.id}
-              href={`/seller/products/${product.id}`}
-              className="flex items-center justify-between py-3 hover:bg-surface px-2 -mx-2"
-            >
-              <div>
-                <p className="text-sm">{product.title}</p>
-                <p className="text-xs text-muted uppercase tracking-wide">{product.status}</p>
-              </div>
-              <p className="text-sm">{formatPrice(product.base_price)}</p>
-            </Link>
-          ))}
+        <div className="border border-border">
+          <div className="hidden grid-cols-[1fr_120px_120px] gap-4 border-b border-border bg-surface px-5 py-3 text-xs uppercase tracking-wide text-muted sm:grid">
+            <span>Product</span>
+            <span>Status</span>
+            <span className="text-right">Price</span>
+          </div>
+          <div className="divide-y divide-border">
+            {products.map((product) => (
+              <Link
+                key={product.id}
+                href={`/seller/products/${product.id}`}
+                className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-4 transition-colors hover:bg-surface sm:grid-cols-[1fr_120px_120px]"
+              >
+                <span className="text-sm text-ink">{product.title}</span>
+                <Badge variant={product.status === "active" ? "accent" : "neutral"}>{product.status}</Badge>
+                <span className="text-right text-sm text-ink">{formatPrice(product.base_price)}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       ) : (
-        <p className="text-muted text-sm">No products yet. Add your first one.</p>
+        <div className="border border-dashed border-border-strong px-6 py-14 text-center">
+          <p className="text-sm text-muted">No products yet.</p>
+          <div className="mt-4 flex justify-center">
+            <LinkButton href="/seller/products/new" variant="secondary">Add your first product</LinkButton>
+          </div>
+        </div>
       )}
     </div>
   );

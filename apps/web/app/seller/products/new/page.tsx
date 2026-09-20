@@ -1,4 +1,6 @@
 import { createProduct } from "@/lib/products/actions";
+import { Input, Textarea, Label } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default async function NewProductPage({
   searchParams,
@@ -9,42 +11,48 @@ export default async function NewProductPage({
 
   return (
     <div className="max-w-lg space-y-6">
-      <h1 className="font-display text-2xl">Add product</h1>
+      <div>
+        <h1 className="font-display text-2xl text-ink">Add product</h1>
+        <p className="mt-1 text-sm text-muted">New products start as a draft until you publish them.</p>
+      </div>
 
       {error && <p className="text-sm text-accent">{decodeURIComponent(error)}</p>}
 
-      <form action={createProduct} className="space-y-4">
+      <form action={createProduct} className="space-y-5 border border-border bg-surface p-6">
         <div>
-          <label className="block text-sm mb-1" htmlFor="title">Title</label>
-          <input id="title" name="title" type="text" required className="w-full border border-border px-3 py-2 text-sm" />
+          <Label htmlFor="title">Title</Label>
+          <Input id="title" name="title" type="text" required />
         </div>
         <div>
-          <label className="block text-sm mb-1" htmlFor="slug">URL slug</label>
-          <input id="slug" name="slug" type="text" required pattern="[a-z0-9-]+" className="w-full border border-border px-3 py-2 text-sm" />
-          <p className="mt-1 text-xs text-muted">Lowercase letters, numbers, and hyphens only.</p>
+          <Label htmlFor="slug">URL slug</Label>
+          <Input id="slug" name="slug" type="text" required pattern="[a-z0-9-]+" />
+          <p className="mt-1.5 text-xs text-muted">Lowercase letters, numbers, and hyphens only.</p>
         </div>
         <div>
-          <label className="block text-sm mb-1" htmlFor="category">Category</label>
-          <input id="category" name="category" type="text" required placeholder="e.g. shirts" className="w-full border border-border px-3 py-2 text-sm" />
+          <Label htmlFor="category">Category</Label>
+          <Input id="category" name="category" type="text" required placeholder="e.g. shirts" />
         </div>
         <div>
-          <label className="block text-sm mb-1" htmlFor="basePrice">Price (PKR)</label>
-          <input id="basePrice" name="basePrice" type="number" min="0" step="1" required className="w-full border border-border px-3 py-2 text-sm" />
+          <Label htmlFor="basePrice">Price (PKR)</Label>
+          <Input id="basePrice" name="basePrice" type="number" min="0" step="1" required />
         </div>
         <div>
-          <label className="block text-sm mb-1" htmlFor="description">Description</label>
-          <textarea id="description" name="description" rows={4} className="w-full border border-border px-3 py-2 text-sm" />
+          <Label htmlFor="description">Description</Label>
+          <Textarea id="description" name="description" rows={4} />
         </div>
         <div>
-          <label className="block text-sm mb-1" htmlFor="status">Status</label>
-          <select id="status" name="status" defaultValue="draft" className="w-full border border-border px-3 py-2 text-sm">
+          <Label htmlFor="status">Status</Label>
+          <select
+            id="status"
+            name="status"
+            defaultValue="draft"
+            className="w-full border border-border bg-background px-3.5 py-2.5 text-sm text-ink focus:border-accent focus:outline-none"
+          >
             <option value="draft">Draft</option>
             <option value="active">Active</option>
           </select>
         </div>
-        <button type="submit" className="bg-accent text-accent-ink px-5 py-2.5 text-sm font-medium hover:opacity-90">
-          Create product
-        </button>
+        <Button type="submit" size="lg">Create product</Button>
       </form>
     </div>
   );

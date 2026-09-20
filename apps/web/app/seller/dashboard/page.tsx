@@ -19,29 +19,32 @@ export default async function SellerDashboardPage() {
   const totalSales = (orderItems ?? []).reduce((sum, i) => sum + i.unit_price * i.quantity, 0);
   const totalCommission = (orderItems ?? []).reduce((sum, i) => sum + i.commission_amount, 0);
 
+  const stats = [
+    { label: "Products", value: String(productCount ?? 0) },
+    { label: "Total sales", value: formatPrice(totalSales) },
+    { label: "Commission owed", value: formatPrice(totalCommission) },
+  ];
+
   return (
     <div className="space-y-8">
-      <h1 className="font-display text-2xl">Overview</h1>
+      <div>
+        <h1 className="font-display text-2xl text-ink">Overview</h1>
+        <p className="mt-1 text-sm text-muted">A snapshot of how your brand is performing.</p>
+      </div>
 
       {brand!.status !== "active" && (
-        <p className="border border-border bg-surface px-4 py-3 text-sm">
-          Your brand is currently <strong>{brand!.status}</strong>. Products will not be visible to customers until an admin approves your brand.
-        </p>
+        <div className="border-l-4 border-accent bg-accent-soft px-5 py-4 text-sm text-accent-soft-ink">
+          Your brand is currently <strong className="font-medium">{brand!.status}</strong>. Products will not be visible to customers until an admin approves your brand.
+        </div>
       )}
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="border border-border p-4">
-          <p className="text-xs uppercase tracking-wide text-muted">Products</p>
-          <p className="mt-1 text-2xl">{productCount ?? 0}</p>
-        </div>
-        <div className="border border-border p-4">
-          <p className="text-xs uppercase tracking-wide text-muted">Total sales</p>
-          <p className="mt-1 text-2xl">{formatPrice(totalSales)}</p>
-        </div>
-        <div className="border border-border p-4">
-          <p className="text-xs uppercase tracking-wide text-muted">Commission owed</p>
-          <p className="mt-1 text-2xl">{formatPrice(totalCommission)}</p>
-        </div>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {stats.map((stat) => (
+          <div key={stat.label} className="border border-border bg-surface p-6">
+            <p className="text-xs uppercase tracking-wide text-muted">{stat.label}</p>
+            <p className="mt-2 font-display text-3xl text-ink">{stat.value}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
