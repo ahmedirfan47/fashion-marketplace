@@ -12,12 +12,12 @@ type ProductCardProps = {
 export function ProductCard({ slug, title, price, brandName }: ProductCardProps) {
   return (
     <Link href={`/products/${slug}`} className="group block">
-      <ProductPlaceholder className="aspect-[3/4] w-full group-hover:border-ink/40 transition-colors" />
+      <ProductPlaceholder className="aspect-[3/4] w-full transition-colors group-hover:bg-accent-soft" />
       <div className="mt-3 space-y-1">
         {brandName && (
-          <p className="text-xs uppercase tracking-wide text-muted">{brandName}</p>
+          <p className="text-[11px] uppercase tracking-wide text-muted">{brandName}</p>
         )}
-        <h3 className="text-sm text-ink group-hover:text-accent transition-colors">
+        <h3 className="text-sm text-ink transition-colors group-hover:text-accent">
           {title}
         </h3>
         <p className="text-sm text-muted">{formatPrice(price)}</p>

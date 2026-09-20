@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { signUp } from "@/lib/auth/actions";
+import { Input, Label } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default async function SignupPage({
   searchParams,
@@ -9,54 +11,38 @@ export default async function SignupPage({
   const { error } = await searchParams;
 
   return (
-    <main className="mx-auto max-w-sm px-6 py-16">
-      <h1 className="font-display text-2xl mb-6">Create an account</h1>
+    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-16">
+      <Link href="/" className="mb-10 font-display text-xl text-ink">
+        Marketplace
+      </Link>
 
-      {error && <p className="mb-4 text-sm text-accent">{decodeURIComponent(error)}</p>}
+      <div className="border border-border bg-surface p-8">
+        <h1 className="font-display text-2xl text-ink">Create an account</h1>
 
-      <form action={signUp} className="space-y-4">
-        <div>
-          <label className="block text-sm mb-1" htmlFor="fullName">Full name</label>
-          <input
-            id="fullName"
-            name="fullName"
-            type="text"
-            required
-            className="w-full border border-border px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm mb-1" htmlFor="email">Email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="w-full border border-border px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm mb-1" htmlFor="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            minLength={6}
-            className="w-full border border-border px-3 py-2 text-sm"
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-accent text-accent-ink px-5 py-2.5 text-sm font-medium hover:opacity-90"
-        >
-          Create account
-        </button>
-      </form>
+        {error && <p className="mt-4 text-sm text-accent">{decodeURIComponent(error)}</p>}
 
-      <p className="mt-6 text-sm text-muted">
+        <form action={signUp} className="mt-6 space-y-4">
+          <div>
+            <Label htmlFor="fullName">Full name</Label>
+            <Input id="fullName" name="fullName" type="text" required />
+          </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" name="email" type="email" required />
+          </div>
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" name="password" type="password" required minLength={6} />
+          </div>
+          <Button type="submit" size="lg" className="w-full">
+            Create account
+          </Button>
+        </form>
+      </div>
+
+      <p className="mt-6 text-center text-sm text-muted">
         Already have an account?{" "}
-        <Link href="/login" className="text-ink underline">
+        <Link href="/login" className="text-ink underline underline-offset-2 hover:text-accent">
           Sign in
         </Link>
       </p>

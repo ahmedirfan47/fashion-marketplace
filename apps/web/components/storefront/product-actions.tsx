@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart/cart-context";
+import { Button } from "@/components/ui/button";
 
 type Variant = {
   id: string;
@@ -59,60 +60,64 @@ export function ProductActions({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 border-t border-border pt-6">
       {variants.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm font-medium">Options</p>
+        <div className="space-y-2.5">
+          <p className="text-xs uppercase tracking-wide text-muted">Options</p>
           <div className="flex flex-wrap gap-2">
-            {variants.map((variant) => (
-              <button
-                key={variant.id}
-                type="button"
-                onClick={() => setSelectedId(variant.id)}
-                disabled={variant.stock_quantity === 0}
-                className={`border px-3 py-1.5 text-sm transition-colors ${
-                  selectedId === variant.id
-                    ? "border-accent text-accent"
-                    : "border-border text-ink hover:border-accent"
-                } ${variant.stock_quantity === 0 ? "opacity-40 cursor-not-allowed" : ""}`}
-              >
-                {[variant.size, variant.color].filter(Boolean).join(" / ") || variant.sku}
-                {variant.stock_quantity === 0 && " (out of stock)"}
-              </button>
-            ))}
+            {variants.map((variant) => {
+              const isSelected = selectedId === variant.id;
+              const isOut = variant.stock_quantity === 0;
+              return (
+                <button
+                  key={variant.id}
+                  type="button"
+                  onClick={() => setSelectedId(variant.id)}
+                  disabled={isOut}
+                  className={`border px-4 py-2 text-sm transition-colors ${
+                    isSelected
+                      ? "border-accent bg-accent-soft text-accent-soft-ink"
+                      : "border-border text-ink hover:border-accent"
+                  } ${isOut ? "cursor-not-allowed opacity-40" : ""}`}
+                >
+                  {[variant.size, variant.color].filter(Boolean).join(" / ") || variant.sku}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
       <div className="flex items-center gap-3">
-        <label htmlFor="quantity" className="text-sm">Qty</label>
-        <input
-          id="quantity"
-          type="number"
-          min={1}
-          value={quantity}
-          onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-          className="w-16 border border-border px-2 py-1.5 text-sm"
-        />
+        <p className="text-xs uppercase tracking-wide text-muted">Qty</p>
+        <div className="flex items-center border border-border">
+          <button
+            type="button"
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            className="h-9 w-9 text-ink transition-colors hover:text-accent"
+            aria-label="Decrease quantity"
+          >
+            −
+          </button>
+          <span className="w-9 text-center text-sm">{quantity}</span>
+          <button
+            type="button"
+            onClick={() => setQuantity((q) => q + 1)}
+            className="h-9 w-9 text-ink transition-colors hover:text-accent"
+            aria-label="Increase quantity"
+          >
+            +
+          </button>
+        </div>
       </div>
 
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          disabled={outOfStock}
-          className="flex-1 border border-border px-5 py-2.5 text-sm font-medium hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed"
-        >
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Button type="button" variant="secondary" size="lg" onClick={handleAddToCart} disabled={outOfStock} className="flex-1">
           {added ? "Added" : "Add to cart"}
-        </button>
-        <button
-          type="button"
-          onClick={handleBuyNow}
-          disabled={outOfStock}
-          className="flex-1 bg-accent text-accent-ink px-5 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
+        </Button>
+        <Button type="button" variant="primary" size="lg" onClick={handleBuyNow} disabled={outOfStock} className="flex-1">
           Buy now
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/utils";
 import { ProductActions } from "@/components/storefront/product-actions";
@@ -36,29 +37,61 @@ export default async function ProductPage({
 
   const brand = product.brands as unknown as { name: string; slug: string } | null;
   const variants = (product.product_variants ?? []) as unknown as Variant[];
+  const totalStock = variants.reduce((sum, v) => sum + v.stock_quantity, 0);
 
   return (
-    <main className="mx-auto grid max-w-6xl gap-12 px-6 py-12 md:grid-cols-2">
-      <ProductPlaceholder className="aspect-[3/4]" iconClassName="h-14 w-14" />
-
-      <div className="space-y-6">
+    <main className="mx-auto max-w-6xl px-6 py-10">
+      <nav className="mb-8 flex items-center gap-2 text-xs text-muted">
+        <Link href="/" className="hover:text-accent">Shop</Link>
+        <span>/</span>
         {brand && (
-          <p className="text-xs uppercase tracking-wide text-muted">{brand.name}</p>
+          <>
+            <Link href={`/brands/${brand.slug}`} className="hover:text-accent">{brand.name}</Link>
+            <span>/</span>
+          </>
         )}
-        <h1 className="font-display text-3xl">{product.title}</h1>
-        <p className="text-lg">{formatPrice(product.base_price)}</p>
+        <span className="text-ink">{product.title}</span>
+      </nav>
 
-        {product.description && (
-          <p className="leading-relaxed text-muted">{product.description}</p>
-        )}
+      <div className="grid gap-12 md:grid-cols-2">
+        <ProductPlaceholder className="aspect-[3/4]" iconClassName="h-14 w-14" />
 
-        <ProductActions
-          productSlug={slug}
-          productTitle={product.title}
-          brandName={brand?.name}
-          basePrice={product.base_price}
-          variants={variants}
-        />
+        <div className="space-y-6 md:max-w-md">
+          <div>
+            {brand && (
+              <Link
+                href={`/brands/${brand.slug}`}
+                className="text-xs uppercase tracking-wide text-muted transition-colors hover:text-accent"
+              >
+                {brand.name}
+              </Link>
+            )}
+            <h1 className="mt-2 font-display text-3xl text-ink">{product.title}</h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <p className="text-lg text-ink">{formatPrice(product.base_price)}</p>
+            <span
+              className={`px-2.5 py-1 text-[11px] uppercase tracking-wide ${
+                totalStock > 0 ? "bg-accent-soft text-accent-soft-ink" : "bg-surface text-muted"
+              }`}
+            >
+              {totalStock > 0 ? "In stock" : "Out of stock"}
+            </span>
+          </div>
+
+          {product.description && (
+            <p className="leading-relaxed text-muted">{product.description}</p>
+          )}
+
+          <ProductActions
+            productSlug={slug}
+            productTitle={product.title}
+            brandName={brand?.name}
+            basePrice={product.base_price}
+            variants={variants}
+          />
+        </div>
       </div>
     </main>
   );

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart/cart-context";
 import { createOrder } from "@/lib/orders/actions";
 import { formatPrice } from "@/lib/utils";
+import { Input, Label } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart();
@@ -44,73 +46,58 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16 text-center">
-        <h1 className="font-display text-2xl mb-4">Your cart is empty</h1>
+      <main className="mx-auto max-w-lg px-6 py-24 text-center">
+        <h1 className="font-display text-2xl text-ink">Your cart is empty</h1>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-12 space-y-8">
-      <h1 className="font-display text-2xl">Checkout</h1>
+    <main className="mx-auto max-w-4xl px-6 py-14">
+      <h1 className="mb-8 font-display text-2xl text-ink">Checkout</h1>
 
-      {error && <p className="text-sm text-accent">{error}</p>}
+      <div className="grid gap-10 md:grid-cols-[1fr_320px]">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {error && <p className="text-sm text-accent">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm mb-1" htmlFor="fullName">Full name</label>
-          <input
-            id="fullName"
-            name="fullName"
-            type="text"
-            required
-            className="w-full border border-border px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm mb-1" htmlFor="phone">Phone</label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            required
-            className="w-full border border-border px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm mb-1" htmlFor="addressLine">Address</label>
-          <input
-            id="addressLine"
-            name="addressLine"
-            type="text"
-            required
-            className="w-full border border-border px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm mb-1" htmlFor="city">City</label>
-          <input
-            id="city"
-            name="city"
-            type="text"
-            required
-            className="w-full border border-border px-3 py-2 text-sm"
-          />
-        </div>
+          <div>
+            <Label htmlFor="fullName">Full name</Label>
+            <Input id="fullName" name="fullName" type="text" required />
+          </div>
+          <div>
+            <Label htmlFor="phone">Phone</Label>
+            <Input id="phone" name="phone" type="tel" required />
+          </div>
+          <div>
+            <Label htmlFor="addressLine">Address</Label>
+            <Input id="addressLine" name="addressLine" type="text" required />
+          </div>
+          <div>
+            <Label htmlFor="city">City</Label>
+            <Input id="city" name="city" type="text" required />
+          </div>
 
-        <div className="flex items-center justify-between border-t border-border pt-4">
-          <p className="text-sm text-muted">Total (Cash on delivery)</p>
-          <p className="text-lg font-medium">{formatPrice(subtotal)}</p>
-        </div>
+          <Button type="submit" size="lg" disabled={submitting} className="w-full">
+            {submitting ? "Placing order..." : "Place order"}
+          </Button>
+        </form>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full bg-accent text-accent-ink px-5 py-3 text-sm font-medium hover:opacity-90 disabled:opacity-50"
-        >
-          {submitting ? "Placing order..." : "Place order"}
-        </button>
-      </form>
+        <div className="h-fit border border-border bg-surface p-6">
+          <p className="text-sm font-medium text-ink">Order summary</p>
+          <div className="mt-4 flex items-center justify-between text-sm text-muted">
+            <span>Items</span>
+            <span className="text-ink">{items.length}</span>
+          </div>
+          <div className="mt-2 flex items-center justify-between text-sm text-muted">
+            <span>Payment</span>
+            <span className="text-ink">Cash on delivery</span>
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-sm">
+            <span className="text-muted">Total</span>
+            <span className="text-base text-ink">{formatPrice(subtotal)}</span>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ProductCard } from "@/components/storefront/product-card";
 
@@ -29,28 +30,37 @@ export default async function BrandPage({
     .order("created_at", { ascending: false });
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12 space-y-10">
-      <div>
-        <h1 className="font-display text-3xl">{brand.name}</h1>
-        {brand.description && (
-          <p className="mt-2 text-muted max-w-xl">{brand.description}</p>
-        )}
+    <main>
+      <div className="border-b border-border bg-surface">
+        <div className="mx-auto max-w-6xl px-6 py-14">
+          <nav className="mb-6 text-xs text-muted">
+            <Link href="/" className="hover:text-accent">Shop</Link>
+            <span className="mx-2">/</span>
+            <span className="text-ink">{brand.name}</span>
+          </nav>
+          <h1 className="font-display text-4xl text-ink">{brand.name}</h1>
+          {brand.description && (
+            <p className="mt-3 max-w-xl text-muted">{brand.description}</p>
+          )}
+        </div>
       </div>
 
-      {products && products.length > 0 ? (
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              slug={product.slug}
-              title={product.title}
-              price={product.base_price}
-            />
-          ))}
-        </div>
-      ) : (
-        <p className="text-muted">No products from this brand yet.</p>
-      )}
+      <div className="mx-auto max-w-6xl px-6 py-14">
+        {products && products.length > 0 ? (
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                slug={product.slug}
+                title={product.title}
+                price={product.base_price}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted">No products from this brand yet.</p>
+        )}
+      </div>
     </main>
   );
 }

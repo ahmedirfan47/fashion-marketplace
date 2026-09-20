@@ -6,10 +6,11 @@ export function ProductPlaceholder({
   iconClassName?: string;
 }) {
   return (
-    <div className={`flex items-center justify-center bg-surface border border-border ${className}`}>
+    <div className={`relative flex items-center justify-center overflow-hidden bg-surface ${className}`}>
+      <div className="absolute inset-0 bg-gradient-to-br from-surface via-surface to-border/40" />
       <svg
         viewBox="0 0 48 48"
-        className={`text-ink/15 ${iconClassName}`}
+        className={`relative text-border-strong ${iconClassName}`}
         fill="none"
         stroke="currentColor"
         strokeWidth="1"

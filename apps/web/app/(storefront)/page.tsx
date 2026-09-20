@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { BrandCard } from "@/components/storefront/brand-card";
 import { ProductCard } from "@/components/storefront/product-card";
 import { ProductPlaceholder } from "@/components/ui/product-placeholder";
-import Link from "next/link";
+import { TrustBar } from "@/components/storefront/trust-bar";
+import { LinkButton } from "@/components/ui/button";
 
 export default async function StorefrontHome() {
   const supabase = await createClient();
@@ -22,10 +23,12 @@ export default async function StorefrontHome() {
 
   return (
     <main>
-      <section className="mx-auto grid max-w-6xl gap-10 px-6 pt-16 pb-20 md:grid-cols-[1.3fr_1fr] md:items-end">
+      <section className="mx-auto grid max-w-6xl gap-12 px-6 pt-14 pb-16 md:grid-cols-[1.2fr_1fr] md:items-center md:pt-20 md:pb-20">
         <div>
-          <p className="mb-4 text-xs uppercase tracking-wide text-muted">New season</p>
-          <h1 className="font-display text-5xl leading-[1.05] sm:text-6xl">
+          <p className="mb-5 inline-flex items-center bg-accent-soft px-3 py-1 text-[11px] uppercase tracking-wide text-accent-soft-ink">
+            New season
+          </p>
+          <h1 className="font-display text-5xl leading-[1.05] text-ink sm:text-6xl">
             Independent fashion,
             <br />
             one address.
@@ -34,18 +37,19 @@ export default async function StorefrontHome() {
             Discover clothing and footwear from brands who make their own
             collections, sold directly, shipped from Pakistan.
           </p>
-          <Link
-            href="#new-arrivals"
-            className="mt-8 inline-block border-b border-ink pb-1 text-sm transition-colors hover:border-accent hover:text-accent"
-          >
-            Shop new arrivals
-          </Link>
+          <div className="mt-9">
+            <LinkButton href="#new-arrivals" size="lg">
+              Shop new arrivals
+            </LinkButton>
+          </div>
         </div>
         <ProductPlaceholder className="aspect-[4/5]" iconClassName="h-16 w-16" />
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-20">
-        <h2 className="mb-6 font-display text-2xl">Brands</h2>
+      <TrustBar />
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <h2 className="mb-7 font-display text-2xl text-ink">Brands</h2>
         {brands && brands.length > 0 ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {brands.map((brand) => (
@@ -57,10 +61,10 @@ export default async function StorefrontHome() {
         )}
       </section>
 
-      <section id="new-arrivals" className="mx-auto max-w-6xl scroll-mt-20 px-6 pb-24">
-        <h2 className="mb-6 font-display text-2xl">New arrivals</h2>
+      <section id="new-arrivals" className="mx-auto max-w-6xl scroll-mt-24 px-6 pb-24">
+        <h2 className="mb-7 font-display text-2xl text-ink">New arrivals</h2>
         {products && products.length > 0 ? (
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
             {products.map((product) => (
               <ProductCard
                 key={product.id}

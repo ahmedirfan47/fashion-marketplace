@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { signOut } from "@/lib/auth/actions";
 import { CartIndicator } from "@/components/storefront/cart-indicator";
+import { MobileNav } from "@/components/storefront/mobile-nav";
 
 type SiteHeaderProps = {
   userEmail?: string | null;
@@ -8,28 +9,31 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ userEmail }: SiteHeaderProps) {
   return (
-    <header className="border-b border-border">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <Link href="/" className="font-display text-xl">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <Link href="/" className="font-display text-xl tracking-tight text-ink">
           Marketplace
         </Link>
-        <nav className="flex items-center gap-6 text-sm">
-          <Link href="/" className="hover:text-accent transition-colors">
+
+        <nav className="hidden items-center gap-8 text-sm sm:flex">
+          <Link href="/" className="text-ink transition-colors hover:text-accent">
             Shop
           </Link>
           <CartIndicator />
           {userEmail ? (
             <form action={signOut}>
-              <button type="submit" className="hover:text-accent transition-colors">
+              <button type="submit" className="text-ink transition-colors hover:text-accent">
                 Sign out
               </button>
             </form>
           ) : (
-            <Link href="/login" className="hover:text-accent transition-colors">
+            <Link href="/login" className="text-ink transition-colors hover:text-accent">
               Sign in
             </Link>
           )}
         </nav>
+
+        <MobileNav userEmail={userEmail} signOutAction={signOut} />
       </div>
     </header>
   );
