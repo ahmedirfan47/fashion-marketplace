@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/utils";
 import { ProductActions } from "@/components/storefront/product-actions";
+import { ProductPlaceholder } from "@/components/ui/product-placeholder";
 
 type Variant = {
   id: string;
@@ -37,8 +38,8 @@ export default async function ProductPage({
   const variants = (product.product_variants ?? []) as unknown as Variant[];
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12 grid gap-12 md:grid-cols-2">
-      <div className="aspect-[3/4] bg-surface border border-border" />
+    <main className="mx-auto grid max-w-6xl gap-12 px-6 py-12 md:grid-cols-2">
+      <ProductPlaceholder className="aspect-[3/4]" iconClassName="h-14 w-14" />
 
       <div className="space-y-6">
         {brand && (
@@ -48,7 +49,7 @@ export default async function ProductPage({
         <p className="text-lg">{formatPrice(product.base_price)}</p>
 
         {product.description && (
-          <p className="text-muted leading-relaxed">{product.description}</p>
+          <p className="leading-relaxed text-muted">{product.description}</p>
         )}
 
         <ProductActions

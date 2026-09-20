@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { ProductPlaceholder } from "@/components/ui/product-placeholder";
 
 type ProductCardProps = {
   slug: string;
@@ -11,7 +12,7 @@ type ProductCardProps = {
 export function ProductCard({ slug, title, price, brandName }: ProductCardProps) {
   return (
     <Link href={`/products/${slug}`} className="group block">
-      <div className="aspect-[3/4] w-full bg-surface border border-border" />
+      <ProductPlaceholder className="aspect-[3/4] w-full group-hover:border-ink/40 transition-colors" />
       <div className="mt-3 space-y-1">
         {brandName && (
           <p className="text-xs uppercase tracking-wide text-muted">{brandName}</p>

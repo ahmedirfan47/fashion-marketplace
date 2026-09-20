@@ -1,4 +1,5 @@
 import { SiteHeader } from "@/components/storefront/site-header";
+import { SiteFooter } from "@/components/storefront/site-footer";
 import { createClient } from "@/lib/supabase/server";
 import { CartProvider } from "@/lib/cart/cart-context";
 
@@ -14,9 +15,10 @@ export default async function StorefrontLayout({
 
   return (
     <CartProvider>
-      <div className="min-h-screen">
+      <div className="flex min-h-screen flex-col">
         <SiteHeader userEmail={user?.email ?? null} />
-        {children}
+        <div className="flex-1">{children}</div>
+        <SiteFooter />
       </div>
     </CartProvider>
   );
