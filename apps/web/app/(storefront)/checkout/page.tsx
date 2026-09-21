@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart/cart-context";
-import { createOrder } from "@/lib/orders/actions";
+import { createOrder, previewDiscount } from "@/lib/orders/actions";
 import { formatPrice } from "@/lib/utils";
 import { Input, Label } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,24 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountMessage, setDiscountMessage] = useState<string | null>(null);
+  const [checkingCode, setCheckingCode] = useState(false);
+
+  async function handleApplyCode() {
+    setCheckingCode(true);
+    setDiscountMessage(null);
+    const result = await previewDiscount(discountCode, subtotal);
+    setCheckingCode(false);
+    if (!result.valid) {
+      setDiscountAmount(0);
+      setDiscountMessage(result.message);
+      return;
+    }
+    setDiscountAmount(result.discountAmount);
+    setDiscountMessage(result.message);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -30,7 +48,8 @@ export default function CheckoutPage() {
     const result = await createOrder(
       items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
       shippingAddress,
-      "cod"
+      "cod",
+      discountCode || undefined
     );
 
     setSubmitting(false);
@@ -51,6 +70,8 @@ export default function CheckoutPage() {
       </main>
     );
   }
+
+  const total = Math.max(0, subtotal - discountAmount);
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-14">
@@ -82,19 +103,43 @@ export default function CheckoutPage() {
           </Button>
         </form>
 
-        <div className="h-fit border border-border bg-surface p-6">
+        <div className="h-fit space-y-4 border border-border bg-surface p-6">
           <p className="text-sm font-medium text-ink">Order summary</p>
-          <div className="mt-4 flex items-center justify-between text-sm text-muted">
-            <span>Items</span>
-            <span className="text-ink">{items.length}</span>
+
+          <div className="flex gap-2">
+            <Input
+              placeholder="Discount code"
+              value={discountCode}
+              onChange={(e) => setDiscountCode(e.target.value)}
+            />
+            <Button type="button" variant="secondary" size="sm" onClick={handleApplyCode} disabled={checkingCode || !discountCode}>
+              Apply
+            </Button>
           </div>
-          <div className="mt-2 flex items-center justify-between text-sm text-muted">
-            <span>Payment</span>
-            <span className="text-ink">Cash on delivery</span>
+          {discountMessage && (
+            <p className={`text-xs ${discountAmount > 0 ? "text-accent" : "text-muted"}`}>{discountMessage}</p>
+          )}
+
+          <div className="space-y-2 border-t border-border pt-4 text-sm">
+            <div className="flex items-center justify-between text-muted">
+              <span>Subtotal</span>
+              <span className="text-ink">{formatPrice(subtotal)}</span>
+            </div>
+            {discountAmount > 0 && (
+              <div className="flex items-center justify-between text-muted">
+                <span>Discount</span>
+                <span className="text-accent">-{formatPrice(discountAmount)}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between text-muted">
+              <span>Payment</span>
+              <span className="text-ink">Cash on delivery</span>
+            </div>
           </div>
-          <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-sm">
+
+          <div className="flex items-center justify-between border-t border-border pt-4 text-sm">
             <span className="text-muted">Total</span>
-            <span className="text-base text-ink">{formatPrice(subtotal)}</span>
+            <span className="text-base text-ink">{formatPrice(total)}</span>
           </div>
         </div>
       </div>

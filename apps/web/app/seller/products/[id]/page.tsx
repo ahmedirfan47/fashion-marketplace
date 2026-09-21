@@ -1,6 +1,14 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import { updateProduct, deleteProduct, addVariant, deleteVariant } from "@/lib/products/actions";
+import {
+  updateProduct,
+  deleteProduct,
+  addVariant,
+  deleteVariant,
+  uploadProductImage,
+  deleteProductImage,
+} from "@/lib/products/actions";
 import { Input, Textarea, Label } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,10 +36,17 @@ export default async function EditProductPage({
     notFound();
   }
 
+  const { data: images } = await supabase
+    .from("product_images")
+    .select("id, url, storage_path, position")
+    .eq("product_id", id)
+    .order("position", { ascending: true });
+
   const variants = product.product_variants ?? [];
   const updateProductWithId = updateProduct.bind(null, id);
   const deleteProductWithId = deleteProduct.bind(null, id);
   const addVariantWithId = addVariant.bind(null, id);
+  const uploadImageWithId = uploadProductImage.bind(null, id);
 
   return (
     <div className="max-w-lg space-y-10">
@@ -39,6 +54,43 @@ export default async function EditProductPage({
         <h1 className="font-display text-2xl text-ink">Edit product</h1>
         {saved && <p className="mt-2 text-sm text-accent">Changes saved.</p>}
         {error && <p className="mt-2 text-sm text-accent">{decodeURIComponent(error)}</p>}
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="font-display text-xl text-ink">Images</h2>
+
+        {images && images.length > 0 && (
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+            {images.map((img) => {
+              const deleteImageWithIds = deleteProductImage.bind(null, id, img.id, img.storage_path);
+              return (
+                <div key={img.id} className="group relative aspect-square overflow-hidden border border-border">
+                  <Image src={img.url} alt="" fill className="object-cover" />
+                  <form action={deleteImageWithIds} className="absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition-opacity group-hover:bg-ink/50 group-hover:opacity-100">
+                    <button type="submit" className="bg-background px-3 py-1.5 text-xs text-ink">
+                      Remove
+                    </button>
+                  </form>
+                  {img.position === 0 && (
+                    <Badge variant="accent" className="absolute top-2 left-2">Main</Badge>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <form action={uploadImageWithId} className="flex items-center gap-3 border border-dashed border-border-strong p-5">
+          <input
+            type="file"
+            name="file"
+            accept="image/*"
+            required
+            className="flex-1 text-sm text-muted file:mr-3 file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:text-accent-soft-ink"
+          />
+          <Button type="submit" variant="secondary" size="sm">Upload</Button>
+        </form>
+        <p className="text-xs text-muted">The first image uploaded becomes the main image shown in listings.</p>
       </div>
 
       <form action={updateProductWithId} className="space-y-5 border border-border bg-surface p-6">
@@ -113,7 +165,7 @@ export default async function EditProductPage({
           <p className="text-sm text-muted">No variants yet.</p>
         )}
 
-        <form action={addVariantWithId} className="space-y-4 border border-border bg-surface p-6">
+        <form action={addVariant.bind(null, id)} className="space-y-4 border border-border bg-surface p-6">
           <p className="text-sm font-medium text-ink">Add variant</p>
           <div className="grid grid-cols-2 gap-4">
             <div>

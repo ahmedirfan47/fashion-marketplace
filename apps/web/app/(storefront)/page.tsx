@@ -5,6 +5,20 @@ import { ProductPlaceholder } from "@/components/ui/product-placeholder";
 import { TrustBar } from "@/components/storefront/trust-bar";
 import { LinkButton } from "@/components/ui/button";
 
+type ProductRow = {
+  id: string;
+  title: string;
+  slug: string;
+  base_price: number;
+  brands: { name: string } | null;
+  product_images: { url: string; position: number }[] | null;
+};
+
+function mainImage(images: { url: string; position: number }[] | null) {
+  if (!images || images.length === 0) return null;
+  return [...images].sort((a, b) => a.position - b.position)[0].url;
+}
+
 export default async function StorefrontHome() {
   const supabase = await createClient();
 
@@ -16,7 +30,7 @@ export default async function StorefrontHome() {
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, title, slug, base_price, brands(name)")
+    .select("id, title, slug, base_price, brands(name), product_images(url, position)")
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(12);
@@ -65,13 +79,14 @@ export default async function StorefrontHome() {
         <h2 className="mb-7 font-display text-2xl text-ink">New arrivals</h2>
         {products && products.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-            {products.map((product) => (
+            {(products as unknown as ProductRow[]).map((product) => (
               <ProductCard
                 key={product.id}
                 slug={product.slug}
                 title={product.title}
                 price={product.base_price}
-                brandName={(product.brands as unknown as { name: string } | null)?.name}
+                brandName={product.brands?.name}
+                imageUrl={mainImage(product.product_images)}
               />
             ))}
           </div>

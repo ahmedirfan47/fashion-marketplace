@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { setBrandStatus, addBrandMember, removeBrandMember } from "@/lib/admin/actions";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default async function AdminBrandDetailPage({
   params,
@@ -35,54 +38,52 @@ export default async function AdminBrandDetailPage({
   return (
     <div className="max-w-lg space-y-10">
       <div>
-        <h1 className="font-display text-2xl">{brand.name}</h1>
-        <p className="text-sm text-muted uppercase tracking-wide">{brand.status}</p>
-        {error && <p className="mt-2 text-sm text-accent">{decodeURIComponent(error)}</p>}
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-2xl text-ink">{brand.name}</h1>
+          <Badge variant={brand.status === "active" ? "accent" : "neutral"}>{brand.status}</Badge>
+        </div>
+        {error && <p className="mt-3 text-sm text-accent">{decodeURIComponent(error)}</p>}
       </div>
 
       <div className="flex gap-3">
         <form action={activateBrand}>
-          <button type="submit" className="border border-border px-4 py-2 text-sm hover:bg-surface">
-            Approve / activate
-          </button>
+          <Button type="submit" variant="secondary">Approve / activate</Button>
         </form>
         <form action={suspendBrand}>
-          <button type="submit" className="border border-border px-4 py-2 text-sm hover:bg-surface">
-            Suspend
-          </button>
+          <Button type="submit" variant="secondary">Suspend</Button>
         </form>
       </div>
 
-      <div className="space-y-4 border-t border-border pt-8">
-        <h2 className="font-display text-xl">Members</h2>
+      <div className="space-y-4">
+        <h2 className="font-display text-xl text-ink">Members</h2>
 
         {members && members.length > 0 ? (
-          <div className="divide-y divide-border border-y border-border">
-            {members.map((member) => {
-              const profile = member.profiles as unknown as { full_name: string | null } | null;
-              const removeMemberWithIds = removeBrandMember.bind(null, id, member.user_id);
-              return (
-                <div key={member.user_id} className="flex items-center justify-between py-3 text-sm">
-                  <p>{profile?.full_name ?? member.user_id}</p>
-                  <form action={removeMemberWithIds}>
-                    <button type="submit" className="text-xs text-muted hover:text-accent">
-                      Remove
-                    </button>
-                  </form>
-                </div>
-              );
-            })}
+          <div className="border border-border">
+            <div className="divide-y divide-border">
+              {members.map((member) => {
+                const profile = member.profiles as unknown as { full_name: string | null } | null;
+                const removeMemberWithIds = removeBrandMember.bind(null, id, member.user_id);
+                return (
+                  <div key={member.user_id} className="flex items-center justify-between px-5 py-3.5">
+                    <p className="text-sm text-ink">{profile?.full_name ?? member.user_id}</p>
+                    <form action={removeMemberWithIds}>
+                      <button type="submit" className="text-xs text-muted hover:text-accent">
+                        Remove
+                      </button>
+                    </form>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <p className="text-sm text-muted">No members yet.</p>
         )}
 
-        <form action={addMemberWithId} className="space-y-3 border border-border p-4">
-          <p className="text-sm font-medium">Add member by email</p>
-          <input name="email" type="email" required className="w-full border border-border px-2 py-1.5 text-sm" />
-          <button type="submit" className="border border-border px-4 py-2 text-sm hover:bg-surface">
-            Add
-          </button>
+        <form action={addMemberWithId} className="space-y-3 border border-border bg-surface p-6">
+          <p className="text-sm font-medium text-ink">Add member by email</p>
+          <Input name="email" type="email" required />
+          <Button type="submit" variant="secondary">Add</Button>
         </form>
       </div>
     </div>

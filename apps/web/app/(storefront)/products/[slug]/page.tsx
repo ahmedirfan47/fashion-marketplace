@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/utils";
 import { ProductActions } from "@/components/storefront/product-actions";
@@ -35,6 +36,12 @@ export default async function ProductPage({
     notFound();
   }
 
+  const { data: images } = await supabase
+    .from("product_images")
+    .select("id, url")
+    .eq("product_id", product.id)
+    .order("position", { ascending: true });
+
   const brand = product.brands as unknown as { name: string; slug: string } | null;
   const variants = (product.product_variants ?? []) as unknown as Variant[];
   const totalStock = variants.reduce((sum, v) => sum + v.stock_quantity, 0);
@@ -54,7 +61,26 @@ export default async function ProductPage({
       </nav>
 
       <div className="grid gap-12 md:grid-cols-2">
-        <ProductPlaceholder className="aspect-[3/4]" iconClassName="h-14 w-14" />
+        <div className="space-y-3">
+          {images && images.length > 0 ? (
+            <>
+              <div className="relative aspect-[3/4] overflow-hidden bg-surface">
+                <Image src={images[0].url} alt={product.title} fill className="object-cover" priority />
+              </div>
+              {images.length > 1 && (
+                <div className="grid grid-cols-4 gap-3">
+                  {images.slice(1).map((img) => (
+                    <div key={img.id} className="relative aspect-square overflow-hidden bg-surface">
+                      <Image src={img.url} alt="" fill className="object-cover" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <ProductPlaceholder className="aspect-[3/4]" iconClassName="h-14 w-14" />
+          )}
+        </div>
 
         <div className="space-y-6 md:max-w-md">
           <div>

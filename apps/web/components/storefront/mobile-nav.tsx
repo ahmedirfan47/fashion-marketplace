@@ -35,6 +35,16 @@ export function MobileNav({
               </svg>
             </button>
           </div>
+
+          <form action="/search" method="GET" className="border-b border-border px-6 py-4">
+            <input
+              type="text"
+              name="q"
+              placeholder="Search products"
+              className="w-full border-b border-border bg-transparent py-2 text-base text-ink placeholder:text-muted focus:border-accent focus:outline-none"
+            />
+          </form>
+
           <nav className="flex flex-col text-lg">
             <Link href="/" onClick={() => setOpen(false)} className="border-b border-border px-6 py-4 text-ink">
               Shop
@@ -43,11 +53,16 @@ export function MobileNav({
               Cart
             </Link>
             {userEmail ? (
-              <form action={signOutAction}>
-                <button type="submit" className="w-full border-b border-border px-6 py-4 text-left text-ink">
-                  Sign out
-                </button>
-              </form>
+              <>
+                <Link href="/orders" onClick={() => setOpen(false)} className="border-b border-border px-6 py-4 text-ink">
+                  Orders
+                </Link>
+                <form action={signOutAction}>
+                  <button type="submit" className="w-full border-b border-border px-6 py-4 text-left text-ink">
+                    Sign out
+                  </button>
+                </form>
+              </>
             ) : (
               <Link href="/login" onClick={() => setOpen(false)} className="border-b border-border px-6 py-4 text-ink">
                 Sign in

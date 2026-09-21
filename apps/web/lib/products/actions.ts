@@ -113,3 +113,52 @@ export async function deleteVariant(productId: string, variantId: string) {
   revalidatePath(`/seller/products/${productId}`);
   redirect(`/seller/products/${productId}`);
 }
+
+export async function uploadProductImage(productId: string, formData: FormData) {
+  const supabase = await createClient();
+  const file = formData.get("file") as File | null;
+
+  if (!file || file.size === 0) {
+    redirect(`/seller/products/${productId}?error=${encodeURIComponent("Choose an image to upload.")}`);
+  }
+
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `products/${productId}/${crypto.randomUUID()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("product-images")
+    .upload(path, file, { contentType: file.type, upsert: false });
+
+  if (uploadError) {
+    redirect(`/seller/products/${productId}?error=${encodeURIComponent(uploadError.message)}`);
+  }
+
+  const { data: publicUrlData } = supabase.storage.from("product-images").getPublicUrl(path);
+
+  const { count } = await supabase
+    .from("product_images")
+    .select("id", { count: "exact", head: true })
+    .eq("product_id", productId);
+
+  const { error: insertError } = await supabase.from("product_images").insert({
+    product_id: productId,
+    url: publicUrlData.publicUrl,
+    storage_path: path,
+    position: count ?? 0,
+  });
+
+  if (insertError) {
+    redirect(`/seller/products/${productId}?error=${encodeURIComponent(insertError.message)}`);
+  }
+
+  revalidatePath(`/seller/products/${productId}`);
+  redirect(`/seller/products/${productId}?saved=1`);
+}
+
+export async function deleteProductImage(productId: string, imageId: string, storagePath: string) {
+  const supabase = await createClient();
+  await supabase.storage.from("product-images").remove([storagePath]);
+  await supabase.from("product_images").delete().eq("id", imageId);
+  revalidatePath(`/seller/products/${productId}`);
+  redirect(`/seller/products/${productId}`);
+}

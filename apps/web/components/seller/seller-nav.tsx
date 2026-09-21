@@ -31,6 +31,14 @@ function OrdersIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+function DiscountIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M4 12l7-8h9v9l-8 7-8-8z" strokeLinejoin="round" />
+      <circle cx="14" cy="9" r="1.4" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
 function BillingIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -51,17 +59,16 @@ const navItems = [
   { href: "/seller/dashboard", label: "Overview", Icon: OverviewIcon },
   { href: "/seller/products", label: "Products", Icon: ProductsIcon },
   { href: "/seller/orders", label: "Orders", Icon: OrdersIcon },
+  { href: "/seller/discounts", label: "Discounts", Icon: DiscountIcon },
   { href: "/seller/billing", label: "Billing", Icon: BillingIcon },
 ];
 
 export function SellerNav({ brandName, brandStatus }: { brandName: string; brandStatus: string }) {
   const pathname = usePathname();
-
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
   return (
     <>
-      {/* Desktop sidebar */}
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-surface sm:flex">
         <div className="border-b border-border px-6 py-6">
           <p className="text-xs uppercase tracking-wide text-muted">Seller</p>
@@ -92,7 +99,6 @@ export function SellerNav({ brandName, brandStatus }: { brandName: string; brand
         </div>
       </aside>
 
-      {/* Mobile top bar */}
       <div className="sticky top-0 z-40 flex items-center gap-1 overflow-x-auto border-b border-border bg-background px-4 py-3 sm:hidden">
         {navItems.map(({ href, label }) => (
           <Link

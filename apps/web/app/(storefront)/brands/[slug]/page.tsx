@@ -3,6 +3,19 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ProductCard } from "@/components/storefront/product-card";
 
+type ProductRow = {
+  id: string;
+  title: string;
+  slug: string;
+  base_price: number;
+  product_images: { url: string; position: number }[] | null;
+};
+
+function mainImage(images: { url: string; position: number }[] | null) {
+  if (!images || images.length === 0) return null;
+  return [...images].sort((a, b) => a.position - b.position)[0].url;
+}
+
 export default async function BrandPage({
   params,
 }: {
@@ -24,7 +37,7 @@ export default async function BrandPage({
 
   const { data: products } = await supabase
     .from("products")
-    .select("id, title, slug, base_price")
+    .select("id, title, slug, base_price, product_images(url, position)")
     .eq("brand_id", brand.id)
     .eq("status", "active")
     .order("created_at", { ascending: false });
@@ -48,12 +61,13 @@ export default async function BrandPage({
       <div className="mx-auto max-w-6xl px-6 py-14">
         {products && products.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-            {products.map((product) => (
+            {(products as unknown as ProductRow[]).map((product) => (
               <ProductCard
                 key={product.id}
                 slug={product.slug}
                 title={product.title}
                 price={product.base_price}
+                imageUrl={mainImage(product.product_images)}
               />
             ))}
           </div>

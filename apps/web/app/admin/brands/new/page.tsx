@@ -1,4 +1,6 @@
 import { createBrandWithOwner } from "@/lib/admin/actions";
+import { Input, Label } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default async function NewBrandPage({
   searchParams,
@@ -9,35 +11,36 @@ export default async function NewBrandPage({
 
   return (
     <div className="max-w-lg space-y-6">
-      <h1 className="font-display text-2xl">Add brand</h1>
+      <div>
+        <h1 className="font-display text-2xl text-ink">Add brand</h1>
+        <p className="mt-1 text-sm text-muted">Create a brand and, optionally, link its first seller.</p>
+      </div>
 
       {error && <p className="text-sm text-accent">{decodeURIComponent(error)}</p>}
 
-      <form action={createBrandWithOwner} className="space-y-4">
+      <form action={createBrandWithOwner} className="space-y-5 border border-border bg-surface p-6">
         <div>
-          <label className="block text-sm mb-1" htmlFor="name">Brand name</label>
-          <input id="name" name="name" type="text" required className="w-full border border-border px-3 py-2 text-sm" />
+          <Label htmlFor="name">Brand name</Label>
+          <Input id="name" name="name" type="text" required />
         </div>
         <div>
-          <label className="block text-sm mb-1" htmlFor="slug">URL slug</label>
-          <input id="slug" name="slug" type="text" required pattern="[a-z0-9-]+" className="w-full border border-border px-3 py-2 text-sm" />
+          <Label htmlFor="slug">URL slug</Label>
+          <Input id="slug" name="slug" type="text" required pattern="[a-z0-9-]+" />
         </div>
         <div>
-          <label className="block text-sm mb-1" htmlFor="contactEmail">Contact email</label>
-          <input id="contactEmail" name="contactEmail" type="email" required className="w-full border border-border px-3 py-2 text-sm" />
+          <Label htmlFor="contactEmail">Contact email</Label>
+          <Input id="contactEmail" name="contactEmail" type="email" required />
         </div>
         <div>
-          <label className="block text-sm mb-1" htmlFor="commissionRate">Commission rate (%)</label>
-          <input id="commissionRate" name="commissionRate" type="number" min="0" max="100" step="0.5" required defaultValue="10" className="w-full border border-border px-3 py-2 text-sm" />
+          <Label htmlFor="commissionRate">Commission rate (%)</Label>
+          <Input id="commissionRate" name="commissionRate" type="number" min="0" max="100" step="0.5" required defaultValue="10" />
         </div>
         <div>
-          <label className="block text-sm mb-1" htmlFor="ownerEmail">Owner account email (optional)</label>
-          <input id="ownerEmail" name="ownerEmail" type="email" className="w-full border border-border px-3 py-2 text-sm" />
-          <p className="mt-1 text-xs text-muted">Must be an email of an account that has already signed up. Leave blank to add an owner later.</p>
+          <Label htmlFor="ownerEmail">Owner account email (optional)</Label>
+          <Input id="ownerEmail" name="ownerEmail" type="email" />
+          <p className="mt-1.5 text-xs text-muted">Must be an email of an account that has already signed up.</p>
         </div>
-        <button type="submit" className="bg-accent text-accent-ink px-5 py-2.5 text-sm font-medium hover:opacity-90">
-          Create brand
-        </button>
+        <Button type="submit" size="lg">Create brand</Button>
       </form>
     </div>
   );

@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { signIn } from "@/lib/auth/actions";
+import { requestPasswordReset } from "@/lib/auth/actions";
 import { Input, Label } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export default async function LoginPage({
+export default async function ForgotPasswordPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; message?: string }>;
@@ -17,37 +17,28 @@ export default async function LoginPage({
       </Link>
 
       <div className="border border-border bg-surface p-8">
-        <h1 className="font-display text-2xl text-ink">Sign in</h1>
+        <h1 className="font-display text-2xl text-ink">Reset your password</h1>
+        <p className="mt-2 text-sm text-muted">We will email you a link to set a new one.</p>
 
         {message === "check_email" && (
-          <p className="mt-4 text-sm text-muted">Check your email to confirm your account.</p>
+          <p className="mt-4 text-sm text-muted">Check your email for the reset link.</p>
         )}
         {error && <p className="mt-4 text-sm text-accent">{decodeURIComponent(error)}</p>}
 
-        <form action={signIn} className="mt-6 space-y-4">
+        <form action={requestPasswordReset} className="mt-6 space-y-4">
           <div>
             <Label htmlFor="email">Email</Label>
             <Input id="email" name="email" type="email" required />
           </div>
-          <div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link href="/forgot-password" className="mb-1.5 text-xs text-muted hover:text-accent">
-                Forgot password?
-              </Link>
-            </div>
-            <Input id="password" name="password" type="password" required />
-          </div>
           <Button type="submit" size="lg" className="w-full">
-            Sign in
+            Send reset link
           </Button>
         </form>
       </div>
 
       <p className="mt-6 text-center text-sm text-muted">
-        No account?{" "}
-        <Link href="/signup" className="text-ink underline underline-offset-2 hover:text-accent">
-          Sign up
+        <Link href="/login" className="text-ink underline underline-offset-2 hover:text-accent">
+          Back to sign in
         </Link>
       </p>
     </main>
