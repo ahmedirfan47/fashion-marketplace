@@ -31,11 +31,34 @@ function OrdersIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+function ReturnsIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M4 10h11a4 4 0 0 1 0 8H9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 6l-4 4 4 4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 function DiscountIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M4 12l7-8h9v9l-8 7-8-8z" strokeLinejoin="round" />
       <circle cx="14" cy="9" r="1.4" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+function AnalyticsIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M4 20V10M12 20V4M20 20v-7" strokeLinecap="round" />
+    </svg>
+  );
+}
+function AdsIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M3 11l18-7v16L3 13z" strokeLinejoin="round" />
+      <path d="M7 14v4a2 2 0 0 0 2 2h1v-5" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -57,9 +80,12 @@ function BackIcon({ className }: { className?: string }) {
 
 const navItems = [
   { href: "/seller/dashboard", label: "Overview", Icon: OverviewIcon },
+  { href: "/seller/analytics", label: "Analytics", Icon: AnalyticsIcon },
   { href: "/seller/products", label: "Products", Icon: ProductsIcon },
   { href: "/seller/orders", label: "Orders", Icon: OrdersIcon },
+  { href: "/seller/returns", label: "Returns", Icon: ReturnsIcon },
   { href: "/seller/discounts", label: "Discounts", Icon: DiscountIcon },
+  { href: "/seller/ads", label: "Advertise", Icon: AdsIcon },
   { href: "/seller/billing", label: "Billing", Icon: BillingIcon },
 ];
 

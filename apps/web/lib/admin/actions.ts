@@ -115,3 +115,9 @@ export async function updateProductStatus(
   await supabase.from("products").update({ status }).eq("id", productId);
   revalidatePath("/admin/moderation");
 }
+export async function markOrderPaid(orderId: string) {
+  if (!(await isCurrentUserAdmin())) throw new Error("Not authorized.");
+  const supabase = await createClient();
+  await supabase.from("orders").update({ payment_status: "paid", status: "processing" }).eq("id", orderId);
+  revalidatePath("/admin/orders");
+}

@@ -3,6 +3,7 @@ import { BrandCard } from "@/components/storefront/brand-card";
 import { ProductCard } from "@/components/storefront/product-card";
 import { ProductPlaceholder } from "@/components/ui/product-placeholder";
 import { TrustBar } from "@/components/storefront/trust-bar";
+import { SponsoredSection } from "@/components/storefront/sponsored-section";
 import { LinkButton } from "@/components/ui/button";
 
 type ProductRow = {
@@ -61,6 +62,8 @@ export default async function StorefrontHome() {
       </section>
 
       <TrustBar />
+
+      <SponsoredSection />
 
       <section className="mx-auto max-w-6xl px-6 py-16">
         <h2 className="mb-7 font-display text-2xl text-ink">Brands</h2>

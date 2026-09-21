@@ -54,6 +54,9 @@ export function MobileNav({
             </Link>
             {userEmail ? (
               <>
+                <Link href="/saved" onClick={() => setOpen(false)} className="border-b border-border px-6 py-4 text-ink">
+                  Saved
+                </Link>
                 <Link href="/orders" onClick={() => setOpen(false)} className="border-b border-border px-6 py-4 text-ink">
                   Orders
                 </Link>

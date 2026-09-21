@@ -17,6 +17,7 @@ export default function CheckoutPage() {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountMessage, setDiscountMessage] = useState<string | null>(null);
   const [checkingCode, setCheckingCode] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "bank_transfer">("cod");
 
   async function handleApplyCode() {
     setCheckingCode(true);
@@ -48,7 +49,7 @@ export default function CheckoutPage() {
     const result = await createOrder(
       items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
       shippingAddress,
-      "cod",
+      paymentMethod,
       discountCode || undefined
     );
 
@@ -98,6 +99,30 @@ export default function CheckoutPage() {
             <Input id="city" name="city" type="text" required />
           </div>
 
+          <div>
+            <Label>Payment method</Label>
+            <div className="space-y-2">
+              <label className="flex items-center gap-3 border border-border px-4 py-3 text-sm">
+                <input
+                  type="radio"
+                  name="paymentMethodRadio"
+                  checked={paymentMethod === "cod"}
+                  onChange={() => setPaymentMethod("cod")}
+                />
+                Cash on delivery
+              </label>
+              <label className="flex items-center gap-3 border border-border px-4 py-3 text-sm">
+                <input
+                  type="radio"
+                  name="paymentMethodRadio"
+                  checked={paymentMethod === "bank_transfer"}
+                  onChange={() => setPaymentMethod("bank_transfer")}
+                />
+                Bank transfer
+              </label>
+            </div>
+          </div>
+
           <Button type="submit" size="lg" disabled={submitting} className="w-full">
             {submitting ? "Placing order..." : "Place order"}
           </Button>
@@ -131,10 +156,6 @@ export default function CheckoutPage() {
                 <span className="text-accent">-{formatPrice(discountAmount)}</span>
               </div>
             )}
-            <div className="flex items-center justify-between text-muted">
-              <span>Payment</span>
-              <span className="text-ink">Cash on delivery</span>
-            </div>
           </div>
 
           <div className="flex items-center justify-between border-t border-border pt-4 text-sm">

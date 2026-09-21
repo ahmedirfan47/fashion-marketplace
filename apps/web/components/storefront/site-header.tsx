@@ -25,6 +25,9 @@ export function SiteHeader({ userEmail }: SiteHeaderProps) {
           <CartIndicator />
           {userEmail ? (
             <>
+              <Link href="/saved" className="text-ink transition-colors hover:text-accent">
+                Saved
+              </Link>
               <Link href="/orders" className="text-ink transition-colors hover:text-accent">
                 Orders
               </Link>

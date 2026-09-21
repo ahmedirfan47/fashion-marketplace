@@ -5,6 +5,10 @@ import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/utils";
 import { ProductActions } from "@/components/storefront/product-actions";
 import { ProductPlaceholder } from "@/components/ui/product-placeholder";
+import { SaveButton } from "@/components/storefront/save-button";
+import { isProductSaved } from "@/lib/wishlist/queries";
+import { logProductView } from "@/lib/analytics/log-view";
+import { ReviewsSection } from "@/components/storefront/reviews-section";
 
 type Variant = {
   id: string;
@@ -26,7 +30,7 @@ export default async function ProductPage({
   const { data: product } = await supabase
     .from("products")
     .select(
-      "id, title, description, base_price, brands(name, slug), product_variants(id, sku, size, color, stock_quantity, price_override)"
+      "id, title, description, base_price, brand_id, brands(name, slug), product_variants(id, sku, size, color, stock_quantity, price_override)"
     )
     .eq("slug", slug)
     .eq("status", "active")
@@ -36,11 +40,40 @@ export default async function ProductPage({
     notFound();
   }
 
+  await logProductView(product.id, product.brand_id);
+
   const { data: images } = await supabase
     .from("product_images")
     .select("id, url")
     .eq("product_id", product.id)
     .order("position", { ascending: true });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const saved = user ? await isProductSaved(product.id) : false;
+
+  const { data: reviews } = await supabase
+    .from("reviews")
+    .select("id, rating, comment, created_at, profiles(full_name)")
+    .eq("product_id", product.id)
+    .order("created_at", { ascending: false });
+
+  let eligibleOrderItemId: string | null = null;
+  if (user) {
+    const { data: deliveredItem } = await supabase
+      .from("order_items")
+      .select("id, product_variants!inner(product_id)")
+      .eq("product_variants.product_id", product.id)
+      .eq("fulfillment_status", "delivered")
+      .limit(1)
+      .maybeSingle();
+    eligibleOrderItemId = deliveredItem?.id ?? null;
+  }
+
+  const alreadyReviewed = user && (reviews ?? []).length > 0
+    ? false // ownership check happens via unique constraint; UI just offers the form if eligible
+    : false;
 
   const brand = product.brands as unknown as { name: string; slug: string } | null;
   const variants = (product.product_variants ?? []) as unknown as Variant[];
@@ -117,8 +150,23 @@ export default async function ProductPage({
             basePrice={product.base_price}
             variants={variants}
           />
+
+          {user ? (
+            <SaveButton productId={product.id} initialSaved={saved} />
+          ) : (
+            <Link href="/login" className="block text-sm text-muted underline underline-offset-2 hover:text-accent">
+              Sign in to save this item
+            </Link>
+          )}
         </div>
       </div>
+
+      <ReviewsSection
+        productId={product.id}
+        reviews={reviews ?? []}
+        eligibleOrderItemId={eligibleOrderItemId}
+        isSignedIn={!!user}
+      />
     </main>
   );
 }

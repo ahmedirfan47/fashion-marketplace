@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentSellerBrand } from "@/lib/sellers/queries";
 import { formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { FulfillmentSelect } from "@/components/seller/fulfillment-select";
 
 export default async function SellerOrdersPage() {
   const brand = await getCurrentSellerBrand();
@@ -10,7 +11,7 @@ export default async function SellerOrdersPage() {
   const { data: orderItems } = await supabase
     .from("order_items")
     .select(
-      "id, quantity, unit_price, commission_amount, created_at, orders(id, status), product_variants(sku, size, color, products(title))"
+      "id, quantity, unit_price, commission_amount, fulfillment_status, orders(status), product_variants(sku, size, color, products(title))"
     )
     .eq("brand_id", brand!.id)
     .order("created_at", { ascending: false });
@@ -26,7 +27,6 @@ export default async function SellerOrdersPage() {
         <div className="border border-border">
           <div className="divide-y divide-border">
             {orderItems.map((item) => {
-              const order = item.orders as unknown as { id: string; status: string } | null;
               const variant = item.product_variants as unknown as {
                 sku: string;
                 size: string | null;
@@ -46,7 +46,7 @@ export default async function SellerOrdersPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant="neutral">{order?.status}</Badge>
+                    <FulfillmentSelect itemId={item.id} current={item.fulfillment_status} />
                     <p className="w-24 text-right text-sm text-ink">
                       {formatPrice(item.unit_price * item.quantity)}
                     </p>

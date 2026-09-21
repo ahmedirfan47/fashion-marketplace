@@ -38,12 +38,12 @@ export default async function SearchPage({
     .select("id, title, slug, base_price, brands(name), product_images(url, position)")
     .eq("status", "active");
 
-  if (q) query = query.ilike("title", `%${q}%`);
+  if (q) query = query.textSearch("search_vector", q, { type: "websearch", config: "english" });
   if (category) query = query.eq("category", category);
 
   if (sort === "price_asc") query = query.order("base_price", { ascending: true });
   else if (sort === "price_desc") query = query.order("base_price", { ascending: false });
-  else query = query.order("created_at", { ascending: false });
+  else if (!q) query = query.order("created_at", { ascending: false });
 
   const { data: products } = await query;
 
@@ -84,7 +84,7 @@ export default async function SearchPage({
         <div className="ml-auto flex items-center gap-2 text-xs">
           <span className="text-muted">Sort</span>
           <Link href={buildQuery({ q, category }, { sort: undefined })} className={!sort ? "text-accent" : "text-muted hover:text-accent"}>
-            Newest
+            {q ? "Relevance" : "Newest"}
           </Link>
           <Link href={buildQuery({ q, category }, { sort: "price_asc" })} className={sort === "price_asc" ? "text-accent" : "text-muted hover:text-accent"}>
             Price ↑

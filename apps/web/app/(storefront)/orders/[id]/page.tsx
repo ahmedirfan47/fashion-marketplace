@@ -3,6 +3,9 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/input";
+import { requestReturn } from "@/lib/returns/actions";
 
 type ShippingAddress = {
   fullName: string;
@@ -31,7 +34,7 @@ export default async function OrderDetailPage({
 
   const { data: order } = await supabase
     .from("orders")
-    .select("id, status, total, subtotal, payment_method, shipping_address, created_at")
+    .select("id, status, total, subtotal, discount_amount, payment_method, shipping_address, created_at")
     .eq("id", id)
     .eq("customer_id", user.id)
     .single();
@@ -43,10 +46,19 @@ export default async function OrderDetailPage({
   const { data: items } = await supabase
     .from("order_items")
     .select(
-      "id, quantity, unit_price, product_variants(sku, size, color, products(title, slug, brands(name)))"
+      "id, quantity, unit_price, fulfillment_status, product_variants(sku, size, color, products(title, slug, brands(name)))"
     )
     .eq("order_id", id);
 
+  const itemIds = (items ?? []).map((i) => i.id);
+  const { data: returns } = itemIds.length
+    ? await supabase
+        .from("return_requests")
+        .select("id, order_item_id, status, refund_amount")
+        .in("order_item_id", itemIds)
+    : { data: [] };
+
+  const returnByItem = new Map((returns ?? []).map((r) => [r.order_item_id, r]));
   const address = order.shipping_address as unknown as ShippingAddress | null;
 
   return (
@@ -78,29 +90,53 @@ export default async function OrderDetailPage({
                 color: string | null;
                 products: { title: string; slug: string; brands: { name: string } | null } | null;
               } | null;
+              const existingReturn = returnByItem.get(item.id);
+
               return (
-                <div key={item.id} className="flex items-center justify-between gap-4 px-5 py-4">
-                  <div>
-                    {variant?.products?.brands?.name && (
-                      <p className="text-[11px] uppercase tracking-wide text-muted">
-                        {variant.products.brands.name}
+                <div key={item.id} className="space-y-3 px-5 py-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      {variant?.products?.brands?.name && (
+                        <p className="text-[11px] uppercase tracking-wide text-muted">
+                          {variant.products.brands.name}
+                        </p>
+                      )}
+                      {variant?.products ? (
+                        <Link
+                          href={`/products/${variant.products.slug}`}
+                          className="text-sm text-ink hover:text-accent"
+                        >
+                          {variant.products.title}
+                        </Link>
+                      ) : (
+                        <p className="text-sm text-ink">Product</p>
+                      )}
+                      <p className="mt-0.5 text-xs text-muted">
+                        {[variant?.size, variant?.color].filter(Boolean).join(" / ")} · qty {item.quantity}
                       </p>
-                    )}
-                    {variant?.products ? (
-                      <Link
-                        href={`/products/${variant.products.slug}`}
-                        className="text-sm text-ink hover:text-accent"
-                      >
-                        {variant.products.title}
-                      </Link>
-                    ) : (
-                      <p className="text-sm text-ink">Product</p>
-                    )}
-                    <p className="mt-0.5 text-xs text-muted">
-                      {[variant?.size, variant?.color].filter(Boolean).join(" / ")} · qty {item.quantity}
-                    </p>
+                      <Badge variant="neutral" className="mt-2">{item.fulfillment_status}</Badge>
+                    </div>
+                    <p className="text-sm text-ink">{formatPrice(item.unit_price * item.quantity)}</p>
                   </div>
-                  <p className="text-sm text-ink">{formatPrice(item.unit_price * item.quantity)}</p>
+
+                  {item.fulfillment_status === "delivered" && (
+                    <>
+                      {existingReturn ? (
+                        <Badge variant={existingReturn.status === "refunded" ? "accent" : "neutral"}>
+                          Return {existingReturn.status}
+                        </Badge>
+                      ) : (
+                        <form action={requestReturn} className="space-y-2 border-t border-border pt-3">
+                          <input type="hidden" name="orderItemId" value={item.id} />
+                          <input type="hidden" name="orderId" value={order.id} />
+                          <Textarea name="reason" placeholder="Reason for return" required rows={2} />
+                          <Button type="submit" variant="secondary" size="sm">
+                            Request return
+                          </Button>
+                        </form>
+                      )}
+                    </>
+                  )}
                 </div>
               );
             })}
@@ -113,6 +149,12 @@ export default async function OrderDetailPage({
             <p className="mt-2 text-sm text-ink">
               {order.payment_method === "cod" ? "Cash on delivery" : order.payment_method}
             </p>
+            {order.discount_amount > 0 && (
+              <div className="mt-3 flex items-center justify-between text-sm">
+                <span className="text-muted">Discount</span>
+                <span className="text-accent">-{formatPrice(order.discount_amount)}</span>
+              </div>
+            )}
             <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-sm">
               <span className="text-muted">Total</span>
               <span className="text-ink">{formatPrice(order.total)}</span>

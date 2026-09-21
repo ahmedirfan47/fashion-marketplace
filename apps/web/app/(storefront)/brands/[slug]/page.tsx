@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ProductCard } from "@/components/storefront/product-card";
+import { FollowButton } from "@/components/storefront/follow-button";
+import { isBrandFollowed } from "@/lib/follows/queries";
 
 type ProductRow = {
   id: string;
@@ -42,6 +44,11 @@ export default async function BrandPage({
     .eq("status", "active")
     .order("created_at", { ascending: false });
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const followed = user ? await isBrandFollowed(brand.id) : false;
+
   return (
     <main>
       <div className="border-b border-border bg-surface">
@@ -51,10 +58,21 @@ export default async function BrandPage({
             <span className="mx-2">/</span>
             <span className="text-ink">{brand.name}</span>
           </nav>
-          <h1 className="font-display text-4xl text-ink">{brand.name}</h1>
-          {brand.description && (
-            <p className="mt-3 max-w-xl text-muted">{brand.description}</p>
-          )}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="font-display text-4xl text-ink">{brand.name}</h1>
+              {brand.description && (
+                <p className="mt-3 max-w-xl text-muted">{brand.description}</p>
+              )}
+            </div>
+            {user ? (
+              <FollowButton brandId={brand.id} initialFollowed={followed} />
+            ) : (
+              <Link href="/login" className="text-sm text-muted underline underline-offset-2 hover:text-accent">
+                Sign in to follow
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 

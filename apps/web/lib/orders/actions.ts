@@ -1,6 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { sendEmail } from "@/lib/email/send";
+import { orderConfirmationEmail } from "@/lib/email/templates";
+import { formatPrice } from "@/lib/utils";
 
 type CheckoutItem = {
   variantId: string;
@@ -184,6 +187,14 @@ export async function createOrder(
 
   if (itemsError) {
     return { success: false, error: "Could not save order items. Please try again." };
+  }
+
+  if (user.email) {
+    await sendEmail({
+      to: user.email,
+      subject: "Your order is confirmed",
+      html: orderConfirmationEmail(order.id, formatPrice(total)),
+    });
   }
 
   return { success: true, orderId: order.id };
