@@ -45,6 +45,14 @@ function BillingIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+function WaitlistIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M4 6h16v12H4z" strokeLinejoin="round" />
+      <path d="M4 7l8 6 8-6" strokeLinejoin="round" />
+    </svg>
+  );
+}
 function BackIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -59,6 +67,7 @@ const navItems = [
   { href: "/admin/moderation", label: "Moderation", Icon: ModerationIcon },
   { href: "/admin/ads", label: "Ads", Icon: AdsIcon },
   { href: "/admin/billing", label: "Billing", Icon: BillingIcon },
+  { href: "/admin/waitlist", label: "Waitlist", Icon: WaitlistIcon },
 ];
 
 export function AdminNav() {

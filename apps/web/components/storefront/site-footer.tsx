@@ -28,9 +28,12 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-accent-ink/10">
-        <p className="mx-auto max-w-6xl px-6 py-5 text-xs text-accent-ink/50">
-          © {new Date().getFullYear()} Marketplace. All rights reserved.
-        </p>
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-6 py-5 text-xs text-accent-ink/50 sm:flex-row sm:items-center">
+          <p>© {new Date().getFullYear()} Marketplace. All rights reserved.</p>
+          <Link href="/waitlist" className="text-accent-ink/70 transition-colors hover:text-accent-ink">
+            Join our waiting list
+          </Link>
+        </div>
       </div>
     </footer>
   );
