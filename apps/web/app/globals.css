@@ -45,3 +45,20 @@ body {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+@keyframes brandspin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes brandpulse {
+  0%, 100% {
+    transform: scale(0.7);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
